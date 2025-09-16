@@ -1,0 +1,677 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Jyoti Soni — Cinematic Portfolio</title>
+  <meta name="description" content="Portfolio of Jyoti Soni — Freelance Graphic Designer & Video Editor. Cinematic hero video, soft palette, lightbox, testimonials, contact." />
+
+  <!--
+    README (quick):
+    - Replace HERO_VIDEO_SRC below with your chosen MP4 or WebM URL (hosted or CDN). I included a sample Pexels/Coverr-style video URL; replace it.
+    - Replace placeholder project images (in #gallery: data-full & img src) with your own images or mp4 links (for video previews set data-type="video").
+    - Update CONTACT_EMAIL and RESUME_PATH in the CONFIG section of the script near the bottom.
+    - /resume.pdf should be uploaded to your host root or change RESUME_PATH to point to its URL.
+    - All code is pure HTML/CSS/vanilla JS; you can split into files later if you want.
+  -->
+
+  <style>
+    /* ===========================
+       Color palette (soft cinematic)
+       ===========================
+       --bg:     #0D1B2A (deep navy)
+       --teal:   #00ADB5 (calm teal)
+       --gold:   #FFD369 (muted gold)
+       --text:   #EAEAEA (soft white)
+       --sub:    #A8B2D1 (muted gray-blue)
+       --accent: #FF7B54 (warm coral highlight)
+    */
+    :root{
+      --bg:#0D1B2A;
+      --teal:#00ADB5;
+      --gold:#FFD369;
+      --text:#EAEAEA;
+      --sub:#A8B2D1;
+      --accent:#FF7B54;
+      --panel: rgba(255,255,255,0.03);
+      --glass: rgba(255,255,255,0.03);
+      --radius:14px;
+      --ff-sans: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+      --ff-head: "Space Grotesk", "Segoe UI", sans-serif;
+      --transition: 360ms cubic-bezier(.2,.9,.3,1);
+    }
+
+    /* Base */
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:var(--ff-sans);
+      background:linear-gradient(180deg,var(--bg), #071122 100%);
+      color:var(--text);
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      line-height:1.5;
+      overflow-x:hidden;
+    }
+    a{color:inherit}
+    img,video{display:block;max-width:100%}
+
+    .container{max-width:1150px;margin:0 auto;padding:24px;}
+
+    /* Header / nav */
+    header{
+      position:sticky;top:0;z-index:1200;padding-top:10px;
+      background: linear-gradient(180deg, rgba(13,27,42,0.6), rgba(13,27,42,0.2));
+      backdrop-filter: blur(6px);
+      border-bottom:1px solid rgba(255,255,255,0.02);
+    }
+    .nav-inner{max-width:1150px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:10px 20px;gap:12px}
+    .brand{display:flex;gap:12px;align-items:center}
+    .logo{
+      width:52px;height:52px;border-radius:12px;display:flex;align-items:center;justify-content:center;
+      background:linear-gradient(135deg, rgba(0,173,181,0.14), rgba(255,211,105,0.06));
+      border:1px solid rgba(255,255,255,0.03);font-weight:700;color:var(--teal);font-family:var(--ff-head)
+    }
+    nav{display:flex;gap:16px;align-items:center}
+    nav a{color:var(--sub);font-weight:600;font-size:14px;text-decoration:none;padding:8px 10px;border-radius:8px;transition:all var(--transition)}
+    nav a:hover{color:var(--text);background:rgba(255,255,255,0.02)}
+    .actions{display:flex;gap:10px;align-items:center}
+    .btn{
+      padding:10px 14px;border-radius:12px;font-weight:700;background:linear-gradient(90deg,var(--teal), #00d1c8);
+      color:#051019;text-decoration:none;box-shadow:0 10px 30px rgba(0,173,181,0.06);
+    }
+    .ghost{padding:8px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);color:var(--sub);background:transparent}
+
+    /* HERO */
+    .hero{
+      position:relative;height:78vh;min-height:520px;border-radius:20px;margin:20px 0;overflow:hidden;
+      box-shadow:0 20px 60px rgba(2,6,23,0.5);
+    }
+    .hero-video, .hero-particles{
+      position:absolute;inset:0;z-index:0;pointer-events:none;
+    }
+    .hero-video video{width:100%;height:100%;object-fit:cover;filter:brightness(0.55) contrast(1.02)}
+    /* soft gradient overlay */
+    .hero-overlay{
+      position:absolute;inset:0;background:linear-gradient(180deg, rgba(13,27,42,0.1), rgba(13,27,42,0.6));z-index:1;
+    }
+    /* particle canvas sits above video, below content */
+    .hero-particles{z-index:1;mix-blend-mode:screen;opacity:0.9}
+
+    .hero-content{
+      position:relative;z-index:2;height:100%;display:flex;flex-direction:column;justify-content:center;padding:48px;gap:20px;
+    }
+    .kicker{font-size:13px;color:var(--sub);letter-spacing:1.6px;text-transform:uppercase;font-weight:700}
+    h1.hero-title{font-family:var(--ff-head);font-size:44px;margin:0;line-height:1.02;letter-spacing:-0.6px}
+    p.lead{margin:0;color:var(--sub);max-width:68ch;font-size:16px}
+    .hero-ctas{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap}
+
+    /* small floating panel on the right */
+    .hero-stats{
+      position:absolute;right:28px;bottom:28px;z-index:3;background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+      padding:14px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);color:var(--sub);font-weight:600;
+      backdrop-filter: blur(6px);
+    }
+
+    /* sections */
+    section{padding:64px 0}
+    .section-head{display:flex;align-items:center;gap:18px;margin-bottom:22px}
+    h2{font-size:26px;color:var(--gold);margin:0}
+    p.sub{color:var(--sub);margin:0}
+
+    /* services */
+    .services-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px}
+    .service{
+      background:var(--panel);padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);transition:transform var(--transition), box-shadow var(--transition);
+    }
+    .service:hover{transform:translateY(-10px);box-shadow:0 30px 60px rgba(2,6,23,0.5)}
+    .service .icon{font-size:28px;margin-bottom:8px;color:var(--teal)}
+    .service h3{margin:6px 0 6px}
+
+    /* projects */
+    .projects-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}
+    .project{position:relative;border-radius:12px;overflow:hidden;cursor:pointer;border:1px solid rgba(255,255,255,0.03);transition:transform var(--transition)}
+    .project img{width:100%;height:220px;object-fit:cover;display:block}
+    .project .meta{position:absolute;left:12px;bottom:12px;color:var(--text);text-shadow:0 10px 30px rgba(2,6,23,0.6)}
+    .project:hover{transform:translateY(-6px);box-shadow:0 30px 80px rgba(2,6,23,0.6)}
+
+    /* about + skills */
+    .two-col{display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start}
+    .skills .skill{margin-bottom:12px}
+    .skill-name{font-weight:700}
+    .bar{height:10px;background:rgba(255,255,255,0.04);border-radius:999px;overflow:hidden;margin-top:6px}
+    .bar > i{display:block;height:100%;background:linear-gradient(90deg,var(--teal),var(--gold));width:0;transition:width 1200ms cubic-bezier(.2,.9,.3,1)}
+
+    /* testimonials */
+    .testimonials{margin-top:12px}
+    .carousel{position:relative;overflow:hidden;padding:12px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);border:1px solid rgba(255,255,255,0.03)}
+    .slides{display:flex;transition:transform 600ms cubic-bezier(.2,.9,.3,1)}
+    .slide{min-width:100%;flex-shrink:0;padding:16px}
+    .quote{font-style:italic;color:var(--sub)}
+
+    /* resume + contact */
+    .resume-panel{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+    .download-btn{padding:10px 14px;border-radius:12px;background:linear-gradient(90deg,var(--gold), #ffd88a);color:#051122;font-weight:800;text-decoration:none}
+
+    .contact-panel{display:grid;grid-template-columns:1fr 320px;gap:18px}
+    form input, form textarea{width:100%;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:var(--text)}
+    form textarea{min-height:140px}
+    form button{padding:12px 14px;border-radius:10px;background:linear-gradient(90deg,var(--accent), #ff9a7a);border:none;color:#051122;font-weight:800}
+
+    /* lightbox */
+    .lightbox{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(2,6,23,0.8);z-index:1400;padding:20px}
+    .lightbox.active{display:flex}
+    .lb-content{max-width:1100px;width:100%;max-height:90vh;border-radius:12px;overflow:hidden;background:#000;display:flex;flex-direction:column}
+    .lb-media{flex:1;display:flex;align-items:center;justify-content:center;background:#000}
+    .lb-media img, .lb-media video{max-width:100%;max-height:82vh;display:block}
+    .lb-meta{padding:12px;color:var(--sub);display:flex;justify-content:space-between;align-items:center}
+
+    /* footer */
+    footer{margin-top:36px;padding:24px 0;color:var(--sub);border-top:1px solid rgba(255,255,255,0.02);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap}
+
+    /* small helpers */
+    .muted{color:var(--sub)}
+    .small{font-size:13px}
+    .center{display:flex;justify-content:center;align-items:center}
+
+    /* animations */
+    .fade-up{opacity:0;transform:translateY(12px);transition:opacity 520ms var(--transition), transform 520ms var(--transition)}
+    .show{opacity:1;transform:none}
+
+    /* responsive */
+    @media (max-width:960px){
+      .projects-grid{grid-template-columns:repeat(2,1fr)}
+      .two-col{grid-template-columns:1fr}
+      .services-grid{grid-template-columns:repeat(2,1fr)}
+    }
+    @media (max-width:640px){
+      .projects-grid{grid-template-columns:1fr}
+      nav{display:none}
+      header .nav-inner{padding:8px}
+      .hero{min-height:60vh}
+      .hero-stats{display:none}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="nav-inner container">
+      <div class="brand" aria-hidden="false">
+        <div class="logo">JS</div>
+        <div>
+          <div style="font-weight:800">Jyoti Soni</div>
+          <div class="small muted">Freelance Graphic Designer • Video Editor</div>
+        </div>
+      </div>
+
+      <nav aria-label="Primary navigation">
+        <a href="#projects">Projects</a>
+        <a href="#services">Services</a>
+        <a href="#about">About</a>
+        <a href="#resume">Resume</a>
+        <a href="#contact">Contact</a>
+      </nav>
+
+      <div class="actions">
+        <a class="ghost" id="themeToggle" href="#" title="Toggle theme">🌓</a>
+        <a class="btn" href="#contact">Hire Me</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- HERO: video + particles + content -->
+    <section class="hero" id="hero">
+      <div class="hero-video" aria-hidden="true">
+        <!-- HERO VIDEO: Replace sample link below with your own MP4/WebM (hosted). -->
+        <!-- Sample stock-style video (replace): -->
+        <video id="heroVideo" autoplay muted loop playsinline crossorigin="anonymous">
+          <source src="https://cdn.coverr.co/videos/coverr-editing-on-a-computer-3910/1080p.mp4" type="video/mp4">
+          <!-- If using another file, replace the src above. -->
+        </video>
+      </div>
+
+      <!-- particle canvas -->
+      <canvas id="particleCanvas" class="hero-particles" aria-hidden="true"></canvas>
+
+      <div class="hero-overlay" aria-hidden="true"></div>
+
+      <div class="hero-content">
+        <div class="kicker">Freelance • Visual Storytelling</div>
+        <h1 class="hero-title fade-up">Jyoti Soni</h1>
+        <p class="lead fade-up" style="transition-delay:120ms">I design brand visuals and edit cinematic videos that help creators and small brands stand out. Clean, strategic, and memorable.</p>
+
+        <div class="hero-ctas fade-up" style="transition-delay:200ms">
+          <a class="btn" href="#contact">Start a Project</a>
+          <a class="ghost" href="/resume.pdf" id="downloadResume">Download Résumé</a>
+        </div>
+      </div>
+
+      <div class="hero-stats fade-up" style="transition-delay:260ms">
+        <div style="display:flex;gap:18px">
+          <div style="text-align:center">
+            <div style="font-weight:800;font-size:18px">24+</div>
+            <div class="small muted">Projects</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-weight:800;font-size:18px">18+</div>
+            <div class="small muted">Clients</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SERVICES -->
+    <section id="services" aria-labelledby="servicesTitle">
+      <div class="section-head">
+        <h2 id="servicesTitle">What I do</h2>
+        <div class="muted small">Services tailored for brand growth & engagement</div>
+      </div>
+
+      <div class="services-grid">
+        <div class="service fade-up">
+          <div class="icon">🎨</div>
+          <h3>Brand & Graphic Design</h3>
+          <p class="muted">Logos, brand systems, social assets, packaging & campaigns — visual systems that scale across platforms.</p>
+        </div>
+
+        <div class="service fade-up" style="transition-delay:60ms">
+          <div class="icon">🎬</div>
+          <h3>Video Editing & Motion</h3>
+          <p class="muted">Short-form reels, promo videos, color grading, and subtle motion graphics that increase engagement.</p>
+        </div>
+
+        <div class="service fade-up" style="transition-delay:120ms">
+          <div class="icon">⚡</div>
+          <h3>Creative Direction</h3>
+          <p class="muted">Concept to execution — visual storytelling and content planning aligned with your goals.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROJECTS -->
+    <section id="projects" aria-labelledby="projectsTitle">
+      <div class="section-head">
+        <h2 id="projectsTitle">Featured Work</h2>
+        <div class="muted small">Click any project to preview — images/videos are placeholders</div>
+      </div>
+
+      <div class="projects-grid" id="gallery">
+        <!-- Project card: change data-full to your high-res image or mp4 and set data-type="video" for video -->
+        <article class="project fade-up" tabindex="0" data-type="image" data-full="https://images.unsplash.com/photo-1515879218367-8466d910aaa4?q=80&w=1600&auto=format&fit=crop">
+          <img src="https://images.unsplash.com/photo-1515879218367-8466d910aaa4?q=80&w=1200&auto=format&fit=crop" alt="Social campaign preview">
+          <div class="meta">
+            <div style="font-weight:800">Social Campaign — Brand X</div>
+            <div class="small muted">Graphic • Carousel</div>
+          </div>
+        </article>
+
+        <article class="project fade-up" tabindex="0" data-type="video" data-full="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" style="transition-delay:60ms">
+          <img src="https://images.unsplash.com/photo-1502920917128-1aa500764b58?q=80&w=1200&auto=format&fit=crop" alt="Promo video preview">
+          <div class="meta">
+            <div style="font-weight:800">Promo Video — Cafe PR</div>
+            <div class="small muted">Video • Edit</div>
+          </div>
+        </article>
+
+        <article class="project fade-up" tabindex="0" data-type="image" data-full="https://images.unsplash.com/photo-1526378725820-4a7a6b8c8cf9?q=80&w=1600&auto=format&fit=crop" style="transition-delay:120ms">
+          <img src="https://images.unsplash.com/photo-1526378725820-4a7a6b8c8cf9?q=80&w=1200&auto=format&fit=crop" alt="Packaging preview">
+          <div class="meta">
+            <div style="font-weight:800">Packaging — Organic Co</div>
+            <div class="small muted">Illustration • Mockups</div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section id="about" aria-labelledby="aboutTitle">
+      <div class="section-head">
+        <h2 id="aboutTitle">About Me</h2>
+        <div class="muted small">A little more about how I work</div>
+      </div>
+
+      <div class="two-col">
+        <div>
+          <p class="muted">I’m <strong>Jyoti Soni</strong>, a freelance graphic designer and video editor. I combine clean visual systems with cinematic editing to create work that feels professional yet personal. I collaborate closely with founders, content creators and small agencies to deliver assets that attract attention and keep it.</p>
+
+          <h3 style="margin-top:18px">How I work</h3>
+          <ul style="color:var(--sub)">
+            <li>Discovery call → creative brief → timeline & budget</li>
+            <li>Design & iterate → draft review → final delivery</li>
+            <li>Fast turnarounds for social and campaign assets</li>
+          </ul>
+        </div>
+
+        <aside>
+          <h3 class="muted">Skills</h3>
+          <div class="skills" style="margin-top:12px">
+            <div class="skill">
+              <div class="skill-name">Adobe Photoshop — <span class="small muted">90%</span></div>
+              <div class="bar"><i style="width:0%" data-width="90%"></i></div>
+            </div>
+            <div class="skill">
+              <div class="skill-name">Adobe Illustrator — <span class="small muted">86%</span></div>
+              <div class="bar"><i style="width:0%" data-width="86%"></i></div>
+            </div>
+            <div class="skill">
+              <div class="skill-name">Premiere Pro / Final Cut — <span class="small muted">84%</span></div>
+              <div class="bar"><i style="width:0%" data-width="84%"></i></div>
+            </div>
+            <div class="skill">
+              <div class="skill-name">After Effects (motion basics) — <span class="small muted">70%</span></div>
+              <div class="bar"><i style="width:0%" data-width="70%"></i></div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- TESTIMONIALS -->
+    <section id="testimonials" aria-labelledby="testiTitle">
+      <div class="section-head">
+        <h2 id="testiTitle">Testimonials</h2>
+        <div class="muted small">Client feedback (placeholders)</div>
+      </div>
+
+      <div class="testimonials">
+        <div class="carousel">
+          <div class="slides" id="slides" style="width:300%">
+            <div class="slide">
+              <div class="quote">"Jyoti transformed our brand. The visuals and video edits were outstanding — highly recommended."</div>
+              <div class="small muted" style="margin-top:8px;font-weight:700">— Rohit K., Founder</div>
+            </div>
+            <div class="slide">
+              <div class="quote">"Fast, communicative, and creative — the edits improved our engagement significantly."</div>
+              <div class="small muted" style="margin-top:8px;font-weight:700">— Neha P., Content Lead</div>
+            </div>
+            <div class="slide">
+              <div class="quote">"Great collaboration. Delivered polished assets exactly as needed."</div>
+              <div class="small muted" style="margin-top:8px;font-weight:700">— Arjun S., Marketing</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RESUME -->
+    <section id="resume" aria-labelledby="resumeTitle">
+      <div class="section-head">
+        <h2 id="resumeTitle">Résumé</h2>
+        <div class="muted small">Download a one-page summary</div>
+      </div>
+      <div class="resume-panel">
+        <div class="muted">Experience available on the résumé — download for project details, clients & deliverables.</div>
+        <div class="center">
+          <a class="download-btn" href="/resume.pdf" id="resumeDownload">Download Résumé</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact" aria-labelledby="contactTitle">
+      <div class="section-head">
+        <h2 id="contactTitle">Contact</h2>
+        <div class="muted small">Tell me about your project — budget & timeline help me respond faster</div>
+      </div>
+
+      <div class="contact-panel">
+        <div>
+          <form id="contactForm" onsubmit="return handleContact(event)">
+            <input name="name" placeholder="Your name" required>
+            <input name="email" type="email" placeholder="Your email" required>
+            <input name="subject" placeholder="Subject (e.g., 'Brand refresh')" required>
+            <textarea name="message" placeholder="Short project brief & timeline" required></textarea>
+            <div style="display:flex;gap:12px;align-items:center">
+              <button type="submit">Send message</button>
+              <a class="ghost" href="mailto:jyoti@example.com" id="emailLink">jyoti@example.com</a>
+            </div>
+          </form>
+        </div>
+
+        <aside style="display:flex;flex-direction:column;gap:12px">
+          <div style="padding:12px;border-radius:10px;background:rgba(255,255,255,0.02)">
+            <div style="font-weight:800">Availability</div>
+            <div class="small muted">Remote / Contract / Short projects</div>
+          </div>
+          <div style="padding:12px;border-radius:10px;background:rgba(255,255,255,0.02)">
+            <div style="font-weight:800">Rates</div>
+            <div class="small muted">Starting at $XX / project — custom quotes on request</div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- LIGHTBOX -->
+    <div id="lightbox" class="lightbox" role="dialog" aria-hidden="true">
+      <div class="lb-content" role="document">
+        <div style="display:flex;justify-content:flex-end;padding:8px">
+          <button id="lbClose" class="ghost" aria-label="Close preview">✕</button>
+        </div>
+        <div class="lb-media" id="lbMedia" style="padding:12px">
+          <!-- media injected by JS -->
+        </div>
+        <div class="lb-meta" id="lbMeta">
+          <div class="muted small" id="lbCaption"></div>
+          <div><a id="lbDownload" class="ghost" href="#" download>Download</a></div>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <div>
+        <strong>© 2025 Jyoti Soni</strong> — Freelance Graphic Designer & Video Editor
+      </div>
+      <div style="display:flex;gap:12px;align-items:center">
+        <a class="muted small" href="#" target="_blank">LinkedIn</a>
+        <a class="muted small" href="#" target="_blank">Behance</a>
+        <a class="muted small" href="#" target="_blank">Instagram</a>
+      </div>
+    </footer>
+  </main>
+
+  <script>
+    /* =========================
+       CONFIG - change these
+       ========================= */
+    const CONTACT_EMAIL = "jyoti@example.com";   // update to your real email
+    const RESUME_PATH = "/resume.pdf";           // update if resume hosted elsewhere
+    /* ========================= */
+
+    // Apply email & resume links
+    document.getElementById('emailLink').href = `mailto:${CONTACT_EMAIL}`;
+    document.getElementById('resumeDownload').href = RESUME_PATH;
+    document.getElementById('downloadResume').href = RESUME_PATH;
+
+    // Fade-up reveals on load scroll
+    function revealOnScroll(){
+      document.querySelectorAll('.fade-up').forEach((el, i) => {
+        setTimeout(()=> el.classList.add('show'), 80 + i*80);
+      });
+    }
+    window.addEventListener('load', revealOnScroll);
+
+    // IntersectionObserver for elements that should animate when visible
+    const io = new IntersectionObserver((entries)=>{
+      entries.forEach(entry=>{
+        if(entry.isIntersecting){
+          entry.target.classList.add('show');
+        }
+      });
+    }, {threshold:0.18});
+    document.querySelectorAll('.fade-up').forEach(el=> io.observe(el));
+    document.querySelectorAll('.service').forEach(el=> io.observe(el));
+    document.querySelectorAll('.project').forEach(el=> io.observe(el));
+
+    // Skill bars animate when 'about' visible
+    const skillsEl = document.querySelector('.skills');
+    if(skillsEl){
+      const skillObserver = new IntersectionObserver((entries)=>{
+        entries.forEach(entry=>{
+          if(entry.isIntersecting){
+            document.querySelectorAll('.bar > i').forEach(i=>{
+              const w = i.getAttribute('data-width') || '80%';
+              i.style.width = w;
+            });
+            skillObserver.disconnect();
+          }
+        });
+      }, {threshold:0.45});
+      skillObserver.observe(skillsEl);
+    }
+
+    // Simple testimonials carousel
+    const slides = document.getElementById('slides');
+    if(slides){
+      let idx = 0;
+      const total = slides.children.length;
+      setInterval(()=> {
+        idx = (idx + 1) % total;
+        slides.style.transform = `translateX(-${idx*100}%)`;
+      }, 4200);
+    }
+
+    /* ===== LIGHTBOX ===== */
+    const gallery = document.getElementById('gallery');
+    const lightbox = document.getElementById('lightbox');
+    const lbMedia = document.getElementById('lbMedia');
+    const lbCaption = document.getElementById('lbCaption');
+    const lbDownload = document.getElementById('lbDownload');
+    const lbClose = document.getElementById('lbClose');
+
+    function openLightbox(type, src, caption){
+      lbMedia.innerHTML = '';
+      lbCaption.textContent = caption || '';
+      lbDownload.href = src || '#';
+      if(type === 'video'){
+        const v = document.createElement('video');
+        v.src = src; v.controls = true; v.autoplay = true; v.playsInline = true;
+        v.style.maxWidth = '100%'; v.style.maxHeight = '80vh';
+        lbMedia.appendChild(v);
+      } else {
+        const img = document.createElement('img');
+        img.src = src; img.alt = caption || 'Preview';
+        lbMedia.appendChild(img);
+      }
+      lightbox.classList.add('active');
+      lightbox.setAttribute('aria-hidden','false');
+      document.body.style.overflow = 'hidden';
+      lbClose.focus();
+    }
+    function closeLightbox(){
+      lightbox.classList.remove('active');
+      lightbox.setAttribute('aria-hidden','true');
+      document.body.style.overflow = '';
+      lbMedia.innerHTML = '';
+    }
+    gallery && gallery.addEventListener('click', (e)=>{
+      const card = e.target.closest('.project');
+      if(!card) return;
+      const type = card.dataset.type || 'image';
+      const src = card.dataset.full || card.querySelector('img')?.src;
+      const caption = card.querySelector('.meta')?.innerText || '';
+      if(!src) return;
+      openLightbox(type, src, caption);
+    });
+    lbClose.addEventListener('click', closeLightbox);
+    lightbox.addEventListener('click', (e)=> { if(e.target === lightbox) closeLightbox(); });
+    document.addEventListener('keydown', (e)=> { if(e.key === 'Escape') closeLightbox(); });
+
+    /* ===== Contact form (mailto fallback) ===== */
+    function handleContact(e){
+      e.preventDefault();
+      const fm = e.target;
+      const name = fm.name.value.trim();
+      const email = fm.email.value.trim();
+      const subject = fm.subject.value.trim();
+      const message = fm.message.value.trim();
+      const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`);
+      const mailto = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject || 'Project enquiry')}&body=${body}`;
+      window.location.href = mailto;
+      return false;
+    }
+    window.handleContact = handleContact;
+
+    /* ===== Theme toggle (light/dark soft) ===== */
+    const themeToggle = document.getElementById('themeToggle');
+    const root = document.documentElement;
+    const saved = localStorage.getItem('jyoti-theme') || 'dark';
+    if(saved === 'light') root.style.setProperty('--bg','#f6f7fb');
+    themeToggle && themeToggle.addEventListener('click', (e)=>{
+      e.preventDefault();
+      const now = localStorage.getItem('jyoti-theme') === 'light' ? 'dark' : 'light';
+      localStorage.setItem('jyoti-theme', now);
+      if(now === 'light'){
+        root.style.setProperty('--bg','#f6f7fb'); document.body.style.background = '#f6f7fb';
+      } else {
+        root.style.setProperty('--bg','#0D1B2A'); document.body.style.background = 'linear-gradient(180deg,#0D1B2A,#071122)';
+      }
+    });
+
+    /* ===== Particle background (soft) ===== */
+    (function particleInit(){
+      const canvas = document.getElementById('particleCanvas');
+      if(!canvas) return;
+      const ctx = canvas.getContext('2d');
+      let w, h, particles=[];
+      const colors = ["rgba(0,173,181,0.06)","rgba(255,211,105,0.04)","rgba(255,123,84,0.03)"];
+
+      function resize(){
+        w = canvas.width = canvas.offsetWidth;
+        h = canvas.height = canvas.offsetHeight;
+      }
+      window.addEventListener('resize', resize);
+      resize();
+
+      function createParticles(n=80){
+        particles = [];
+        for(let i=0;i<n;i++){
+          particles.push({
+            x: Math.random()*w,
+            y: Math.random()*h,
+            r: 0.5 + Math.random()*2.2,
+            vx: (Math.random()-0.5)*0.2,
+            vy: (Math.random()-0.5)*0.2,
+            col: colors[Math.floor(Math.random()*colors.length)],
+            drift: Math.random()*0.6
+          });
+        }
+      }
+      createParticles(90);
+
+      function tick(){
+        ctx.clearRect(0,0,w,h);
+        for(const p of particles){
+          p.x += p.vx + Math.sin(Date.now()/10000 + p.drift)*0.15;
+          p.y += p.vy + Math.cos(Date.now()/12000 + p.drift)*0.12;
+          if(p.x < -10) p.x = w + 10;
+          if(p.x > w + 10) p.x = -10;
+          if(p.y < -10) p.y = h + 10;
+          if(p.y > h + 10) p.y = -10;
+
+          ctx.beginPath();
+          ctx.fillStyle = p.col;
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+          ctx.fill();
+        }
+        requestAnimationFrame(tick);
+      }
+      tick();
+    })();
+
+    /* ===== Parallax subtle hero move based on scroll ===== */
+    window.addEventListener('scroll', ()=>{
+      const hero = document.querySelector('.hero');
+      if(!hero) return;
+      const sc = window.scrollY;
+      hero.querySelector('.hero-video') && (hero.querySelector('.hero-video').style.transform = `translateY(${sc * 0.06}px) scale(${1 + Math.min(sc/8000, 0.02)})`);
+    });
+
+    /* ===== Reduce motion preference ===== */
+    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+      document.querySelectorAll('*').forEach(el=> el.style.transition = 'none');
+    }
+  </script>
+</body>
+</html>
