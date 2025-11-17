@@ -1,677 +1,671 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Jyoti Soni — Cinematic Portfolio</title>
-  <meta name="description" content="Portfolio of Jyoti Soni — Freelance Graphic Designer & Video Editor. Cinematic hero video, soft palette, lightbox, testimonials, contact." />
-
-  <!--
-    README (quick):
-    - Replace HERO_VIDEO_SRC below with your chosen MP4 or WebM URL (hosted or CDN). I included a sample Pexels/Coverr-style video URL; replace it.
-    - Replace placeholder project images (in #gallery: data-full & img src) with your own images or mp4 links (for video previews set data-type="video").
-    - Update CONTACT_EMAIL and RESUME_PATH in the CONFIG section of the script near the bottom.
-    - /resume.pdf should be uploaded to your host root or change RESUME_PATH to point to its URL.
-    - All code is pure HTML/CSS/vanilla JS; you can split into files later if you want.
-  -->
-
-  <style>
-    /* ===========================
-       Color palette (soft cinematic)
-       ===========================
-       --bg:     #0D1B2A (deep navy)
-       --teal:   #00ADB5 (calm teal)
-       --gold:   #FFD369 (muted gold)
-       --text:   #EAEAEA (soft white)
-       --sub:    #A8B2D1 (muted gray-blue)
-       --accent: #FF7B54 (warm coral highlight)
-    */
-    :root{
-      --bg:#0D1B2A;
-      --teal:#00ADB5;
-      --gold:#FFD369;
-      --text:#EAEAEA;
-      --sub:#A8B2D1;
-      --accent:#FF7B54;
-      --panel: rgba(255,255,255,0.03);
-      --glass: rgba(255,255,255,0.03);
-      --radius:14px;
-      --ff-sans: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
-      --ff-head: "Space Grotesk", "Segoe UI", sans-serif;
-      --transition: 360ms cubic-bezier(.2,.9,.3,1);
-    }
-
-    /* Base */
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      font-family:var(--ff-sans);
-      background:linear-gradient(180deg,var(--bg), #071122 100%);
-      color:var(--text);
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
-      line-height:1.5;
-      overflow-x:hidden;
-    }
-    a{color:inherit}
-    img,video{display:block;max-width:100%}
-
-    .container{max-width:1150px;margin:0 auto;padding:24px;}
-
-    /* Header / nav */
-    header{
-      position:sticky;top:0;z-index:1200;padding-top:10px;
-      background: linear-gradient(180deg, rgba(13,27,42,0.6), rgba(13,27,42,0.2));
-      backdrop-filter: blur(6px);
-      border-bottom:1px solid rgba(255,255,255,0.02);
-    }
-    .nav-inner{max-width:1150px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:10px 20px;gap:12px}
-    .brand{display:flex;gap:12px;align-items:center}
-    .logo{
-      width:52px;height:52px;border-radius:12px;display:flex;align-items:center;justify-content:center;
-      background:linear-gradient(135deg, rgba(0,173,181,0.14), rgba(255,211,105,0.06));
-      border:1px solid rgba(255,255,255,0.03);font-weight:700;color:var(--teal);font-family:var(--ff-head)
-    }
-    nav{display:flex;gap:16px;align-items:center}
-    nav a{color:var(--sub);font-weight:600;font-size:14px;text-decoration:none;padding:8px 10px;border-radius:8px;transition:all var(--transition)}
-    nav a:hover{color:var(--text);background:rgba(255,255,255,0.02)}
-    .actions{display:flex;gap:10px;align-items:center}
-    .btn{
-      padding:10px 14px;border-radius:12px;font-weight:700;background:linear-gradient(90deg,var(--teal), #00d1c8);
-      color:#051019;text-decoration:none;box-shadow:0 10px 30px rgba(0,173,181,0.06);
-    }
-    .ghost{padding:8px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);color:var(--sub);background:transparent}
-
-    /* HERO */
-    .hero{
-      position:relative;height:78vh;min-height:520px;border-radius:20px;margin:20px 0;overflow:hidden;
-      box-shadow:0 20px 60px rgba(2,6,23,0.5);
-    }
-    .hero-video, .hero-particles{
-      position:absolute;inset:0;z-index:0;pointer-events:none;
-    }
-    .hero-video video{width:100%;height:100%;object-fit:cover;filter:brightness(0.55) contrast(1.02)}
-    /* soft gradient overlay */
-    .hero-overlay{
-      position:absolute;inset:0;background:linear-gradient(180deg, rgba(13,27,42,0.1), rgba(13,27,42,0.6));z-index:1;
-    }
-    /* particle canvas sits above video, below content */
-    .hero-particles{z-index:1;mix-blend-mode:screen;opacity:0.9}
-
-    .hero-content{
-      position:relative;z-index:2;height:100%;display:flex;flex-direction:column;justify-content:center;padding:48px;gap:20px;
-    }
-    .kicker{font-size:13px;color:var(--sub);letter-spacing:1.6px;text-transform:uppercase;font-weight:700}
-    h1.hero-title{font-family:var(--ff-head);font-size:44px;margin:0;line-height:1.02;letter-spacing:-0.6px}
-    p.lead{margin:0;color:var(--sub);max-width:68ch;font-size:16px}
-    .hero-ctas{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap}
-
-    /* small floating panel on the right */
-    .hero-stats{
-      position:absolute;right:28px;bottom:28px;z-index:3;background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
-      padding:14px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);color:var(--sub);font-weight:600;
-      backdrop-filter: blur(6px);
-    }
-
-    /* sections */
-    section{padding:64px 0}
-    .section-head{display:flex;align-items:center;gap:18px;margin-bottom:22px}
-    h2{font-size:26px;color:var(--gold);margin:0}
-    p.sub{color:var(--sub);margin:0}
-
-    /* services */
-    .services-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px}
-    .service{
-      background:var(--panel);padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);transition:transform var(--transition), box-shadow var(--transition);
-    }
-    .service:hover{transform:translateY(-10px);box-shadow:0 30px 60px rgba(2,6,23,0.5)}
-    .service .icon{font-size:28px;margin-bottom:8px;color:var(--teal)}
-    .service h3{margin:6px 0 6px}
-
-    /* projects */
-    .projects-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}
-    .project{position:relative;border-radius:12px;overflow:hidden;cursor:pointer;border:1px solid rgba(255,255,255,0.03);transition:transform var(--transition)}
-    .project img{width:100%;height:220px;object-fit:cover;display:block}
-    .project .meta{position:absolute;left:12px;bottom:12px;color:var(--text);text-shadow:0 10px 30px rgba(2,6,23,0.6)}
-    .project:hover{transform:translateY(-6px);box-shadow:0 30px 80px rgba(2,6,23,0.6)}
-
-    /* about + skills */
-    .two-col{display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start}
-    .skills .skill{margin-bottom:12px}
-    .skill-name{font-weight:700}
-    .bar{height:10px;background:rgba(255,255,255,0.04);border-radius:999px;overflow:hidden;margin-top:6px}
-    .bar > i{display:block;height:100%;background:linear-gradient(90deg,var(--teal),var(--gold));width:0;transition:width 1200ms cubic-bezier(.2,.9,.3,1)}
-
-    /* testimonials */
-    .testimonials{margin-top:12px}
-    .carousel{position:relative;overflow:hidden;padding:12px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);border:1px solid rgba(255,255,255,0.03)}
-    .slides{display:flex;transition:transform 600ms cubic-bezier(.2,.9,.3,1)}
-    .slide{min-width:100%;flex-shrink:0;padding:16px}
-    .quote{font-style:italic;color:var(--sub)}
-
-    /* resume + contact */
-    .resume-panel{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-    .download-btn{padding:10px 14px;border-radius:12px;background:linear-gradient(90deg,var(--gold), #ffd88a);color:#051122;font-weight:800;text-decoration:none}
-
-    .contact-panel{display:grid;grid-template-columns:1fr 320px;gap:18px}
-    form input, form textarea{width:100%;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:var(--text)}
-    form textarea{min-height:140px}
-    form button{padding:12px 14px;border-radius:10px;background:linear-gradient(90deg,var(--accent), #ff9a7a);border:none;color:#051122;font-weight:800}
-
-    /* lightbox */
-    .lightbox{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(2,6,23,0.8);z-index:1400;padding:20px}
-    .lightbox.active{display:flex}
-    .lb-content{max-width:1100px;width:100%;max-height:90vh;border-radius:12px;overflow:hidden;background:#000;display:flex;flex-direction:column}
-    .lb-media{flex:1;display:flex;align-items:center;justify-content:center;background:#000}
-    .lb-media img, .lb-media video{max-width:100%;max-height:82vh;display:block}
-    .lb-meta{padding:12px;color:var(--sub);display:flex;justify-content:space-between;align-items:center}
-
-    /* footer */
-    footer{margin-top:36px;padding:24px 0;color:var(--sub);border-top:1px solid rgba(255,255,255,0.02);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap}
-
-    /* small helpers */
-    .muted{color:var(--sub)}
-    .small{font-size:13px}
-    .center{display:flex;justify-content:center;align-items:center}
-
-    /* animations */
-    .fade-up{opacity:0;transform:translateY(12px);transition:opacity 520ms var(--transition), transform 520ms var(--transition)}
-    .show{opacity:1;transform:none}
-
-    /* responsive */
-    @media (max-width:960px){
-      .projects-grid{grid-template-columns:repeat(2,1fr)}
-      .two-col{grid-template-columns:1fr}
-      .services-grid{grid-template-columns:repeat(2,1fr)}
-    }
-    @media (max-width:640px){
-      .projects-grid{grid-template-columns:1fr}
-      nav{display:none}
-      header .nav-inner{padding:8px}
-      .hero{min-height:60vh}
-      .hero-stats{display:none}
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday!</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts - Poppins for UI and Homemade Apple for handwritten letter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Homemade+Apple&display=swap" rel="stylesheet">
+    <style>
+        /* Apply Poppins font to the entire page */
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        /* Handwritten font for letter */
+        .handwritten {
+            font-family: 'Homemade Apple', cursive;
+        }
+        
+        /* Background pulsing animation */
+        @keyframes pulseGradient {
+            0%, 100% {
+                background-size: 100% 100%;
+                opacity: 0.8;
+            }
+            50% {
+                background-size: 150% 150%;
+                opacity: 1;
+            }
+        }
+        
+        .animated-bg {
+            background: radial-gradient(circle at center, #FFC0CB, #8A2BE2);
+            background-size: 100% 100%;
+            animation: pulseGradient 8s ease-in-out infinite;
+        }
+        
+        /* Floating shapes animation */
+        .floating-shape {
+            position: absolute;
+            opacity: 0.2;
+            filter: blur(1px);
+            animation: float 20s infinite ease-in-out;
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+            25% {
+                transform: translate(30px, -30px) rotate(90deg);
+            }
+            50% {
+                transform: translate(-20px, 20px) rotate(180deg);
+            }
+            75% {
+                transform: translate(40px, 10px) rotate(270deg);
+            }
+        }
+        
+        /* Typing cursor animation */
+        .typing-cursor {
+            display: inline-block;
+            width: 3px;
+            height: 1.2em;
+            background-color: white;
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 50% {
+                opacity: 1;
+            }
+            51%, 100% {
+                opacity: 0;
+            }
+        }
+        
+        /* Dark screen overlay */
+        .dark-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: black;
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.5s ease;
+        }
+        
+        /* White screen */
+        .white-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: white;
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            transition: opacity 0.5s ease;
+        }
+        
+        /* Confetti explosion animation */
+        .confetti-explosion {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 50;
+        }
+        
+        .confetti-piece {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            opacity: 0;
+            animation: confettiBurst 1.5s ease-out forwards;
+        }
+        
+        @keyframes confettiBurst {
+            0% {
+                transform: translate(0, 0) scale(0);
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+            }
+        }
+        
+        /* Cake sticker styles */
+        .cake-sticker {
+            position: absolute;
+            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+            z-index: 10;
+            max-width: 300px;
+            max-height: 300px;
+        }
+        
+        /* Cake appearance animation */
+        @keyframes cakeAppear {
+            0% {
+                transform: scale(0) rotate(0deg);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.2) rotate(10deg);
+            }
+            100% {
+                transform: scale(1) rotate(0deg);
+                opacity: 1;
+            }
+        }
+        
+        .cake-appear {
+            animation: cakeAppear 1s ease forwards;
+        }
+        
+        /* Letter interface styles */
+        .letter-paper {
+            background-color: #fff9e6;
+            border-radius: 5px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .letter-paper::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 30px;
+            background-color: #ff6b6b;
+            border-bottom: 2px dashed #fff;
+        }
+        
+        .letter-paper::after {
+            content: '';
+            position: absolute;
+            top: 30px;
+            left: 0;
+            width: 100%;
+            height: calc(100% - 30px);
+            background-image: repeating-linear-gradient(
+                #e0e0e0,
+                #e0e0e0 1px,
+                transparent 1px,
+                transparent 30px
+            );
+        }
+        
+        .letter-content {
+            position: relative;
+            z-index: 1;
+            padding: 50px 40px;
+            font-family: 'Homemade Apple', cursive;
+            color: #333;
+            line-height: 1.6;
+            font-size: 1.2rem;
+        }
+        
+        /* Button styles */
+        .action-button {
+            background-color: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .action-button:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .action-button:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+        }
+        
+        .white-button {
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+        }
+        
+        .white-button:hover {
+            background-color: rgba(0, 0, 0, 0.9);
+        }
+        
+        /* Fade in animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 1s ease-in-out;
+        }
+        
+        /* Screen styles */
+        .screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        /* Party room image container */
+        .party-room-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%); /* Festive gradient background */
+        }
+        
+        .party-room-image {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Cake positioning in the party room - adjusted for better position */
+        .cake-in-room {
+            position: absolute;
+            bottom: 40%; /* Moved up from 20% to 40% */
+            left: 15%;
+            z-index: 10;
+        }
+        
+        /* Debug info */
+        .debug-info {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            z-index: 1000;
+        }
+    </style>
 </head>
-<body>
-  <header>
-    <div class="nav-inner container">
-      <div class="brand" aria-hidden="false">
-        <div class="logo">JS</div>
-        <div>
-          <div style="font-weight:800">Jyoti Soni</div>
-          <div class="small muted">Freelance Graphic Designer • Video Editor</div>
+<body class="h-screen w-full overflow-hidden relative">
+    <!-- Initial Screen with Birthday Message -->
+    <div id="initial-screen" class="screen flex flex-col items-center justify-center p-6">
+        <!-- Animated Background -->
+        <div id="background" class="absolute inset-0 animated-bg"></div>
+        
+        <!-- Floating Shapes Container -->
+        <div id="shapes-container" class="absolute inset-0 pointer-events-none"></div>
+        
+        <!-- Birthday Message -->
+        <div id="message-container" class="text-center max-w-2xl mb-8 relative z-20">
+            <h1 id="birthday-message" class="text-white text-2xl md:text-4xl font-medium leading-relaxed"></h1>
+            <span id="typing-cursor" class="typing-cursor"></span>
         </div>
-      </div>
-
-      <nav aria-label="Primary navigation">
-        <a href="#projects">Projects</a>
-        <a href="#services">Services</a>
-        <a href="#about">About</a>
-        <a href="#resume">Resume</a>
-        <a href="#contact">Contact</a>
-      </nav>
-
-      <div class="actions">
-        <a class="ghost" id="themeToggle" href="#" title="Toggle theme">🌓</a>
-        <a class="btn" href="#contact">Hire Me</a>
-      </div>
+        
+        <!-- Surprise Button -->
+        <button id="surprise-button" class="action-button relative z-20">
+            Surprise
+        </button>
     </div>
-  </header>
-
-  <main class="container">
-    <!-- HERO: video + particles + content -->
-    <section class="hero" id="hero">
-      <div class="hero-video" aria-hidden="true">
-        <!-- HERO VIDEO: Replace sample link below with your own MP4/WebM (hosted). -->
-        <!-- Sample stock-style video (replace): -->
-        <video id="heroVideo" autoplay muted loop playsinline crossorigin="anonymous">
-          <source src="https://cdn.coverr.co/videos/coverr-editing-on-a-computer-3910/1080p.mp4" type="video/mp4">
-          <!-- If using another file, replace the src above. -->
-        </video>
-      </div>
-
-      <!-- particle canvas -->
-      <canvas id="particleCanvas" class="hero-particles" aria-hidden="true"></canvas>
-
-      <div class="hero-overlay" aria-hidden="true"></div>
-
-      <div class="hero-content">
-        <div class="kicker">Freelance • Visual Storytelling</div>
-        <h1 class="hero-title fade-up">Jyoti Soni</h1>
-        <p class="lead fade-up" style="transition-delay:120ms">I design brand visuals and edit cinematic videos that help creators and small brands stand out. Clean, strategic, and memorable.</p>
-
-        <div class="hero-ctas fade-up" style="transition-delay:200ms">
-          <a class="btn" href="#contact">Start a Project</a>
-          <a class="ghost" href="/resume.pdf" id="downloadResume">Download Résumé</a>
-        </div>
-      </div>
-
-      <div class="hero-stats fade-up" style="transition-delay:260ms">
-        <div style="display:flex;gap:18px">
-          <div style="text-align:center">
-            <div style="font-weight:800;font-size:18px">24+</div>
-            <div class="small muted">Projects</div>
-          </div>
-          <div style="text-align:center">
-            <div style="font-weight:800;font-size:18px">18+</div>
-            <div class="small muted">Clients</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- SERVICES -->
-    <section id="services" aria-labelledby="servicesTitle">
-      <div class="section-head">
-        <h2 id="servicesTitle">What I do</h2>
-        <div class="muted small">Services tailored for brand growth & engagement</div>
-      </div>
-
-      <div class="services-grid">
-        <div class="service fade-up">
-          <div class="icon">🎨</div>
-          <h3>Brand & Graphic Design</h3>
-          <p class="muted">Logos, brand systems, social assets, packaging & campaigns — visual systems that scale across platforms.</p>
-        </div>
-
-        <div class="service fade-up" style="transition-delay:60ms">
-          <div class="icon">🎬</div>
-          <h3>Video Editing & Motion</h3>
-          <p class="muted">Short-form reels, promo videos, color grading, and subtle motion graphics that increase engagement.</p>
-        </div>
-
-        <div class="service fade-up" style="transition-delay:120ms">
-          <div class="icon">⚡</div>
-          <h3>Creative Direction</h3>
-          <p class="muted">Concept to execution — visual storytelling and content planning aligned with your goals.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- PROJECTS -->
-    <section id="projects" aria-labelledby="projectsTitle">
-      <div class="section-head">
-        <h2 id="projectsTitle">Featured Work</h2>
-        <div class="muted small">Click any project to preview — images/videos are placeholders</div>
-      </div>
-
-      <div class="projects-grid" id="gallery">
-        <!-- Project card: change data-full to your high-res image or mp4 and set data-type="video" for video -->
-        <article class="project fade-up" tabindex="0" data-type="image" data-full="https://images.unsplash.com/photo-1515879218367-8466d910aaa4?q=80&w=1600&auto=format&fit=crop">
-          <img src="https://images.unsplash.com/photo-1515879218367-8466d910aaa4?q=80&w=1200&auto=format&fit=crop" alt="Social campaign preview">
-          <div class="meta">
-            <div style="font-weight:800">Social Campaign — Brand X</div>
-            <div class="small muted">Graphic • Carousel</div>
-          </div>
-        </article>
-
-        <article class="project fade-up" tabindex="0" data-type="video" data-full="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" style="transition-delay:60ms">
-          <img src="https://images.unsplash.com/photo-1502920917128-1aa500764b58?q=80&w=1200&auto=format&fit=crop" alt="Promo video preview">
-          <div class="meta">
-            <div style="font-weight:800">Promo Video — Cafe PR</div>
-            <div class="small muted">Video • Edit</div>
-          </div>
-        </article>
-
-        <article class="project fade-up" tabindex="0" data-type="image" data-full="https://images.unsplash.com/photo-1526378725820-4a7a6b8c8cf9?q=80&w=1600&auto=format&fit=crop" style="transition-delay:120ms">
-          <img src="https://images.unsplash.com/photo-1526378725820-4a7a6b8c8cf9?q=80&w=1200&auto=format&fit=crop" alt="Packaging preview">
-          <div class="meta">
-            <div style="font-weight:800">Packaging — Organic Co</div>
-            <div class="small muted">Illustration • Mockups</div>
-          </div>
-        </article>
-      </div>
-    </section>
-
-    <!-- ABOUT -->
-    <section id="about" aria-labelledby="aboutTitle">
-      <div class="section-head">
-        <h2 id="aboutTitle">About Me</h2>
-        <div class="muted small">A little more about how I work</div>
-      </div>
-
-      <div class="two-col">
-        <div>
-          <p class="muted">I’m <strong>Jyoti Soni</strong>, a freelance graphic designer and video editor. I combine clean visual systems with cinematic editing to create work that feels professional yet personal. I collaborate closely with founders, content creators and small agencies to deliver assets that attract attention and keep it.</p>
-
-          <h3 style="margin-top:18px">How I work</h3>
-          <ul style="color:var(--sub)">
-            <li>Discovery call → creative brief → timeline & budget</li>
-            <li>Design & iterate → draft review → final delivery</li>
-            <li>Fast turnarounds for social and campaign assets</li>
-          </ul>
-        </div>
-
-        <aside>
-          <h3 class="muted">Skills</h3>
-          <div class="skills" style="margin-top:12px">
-            <div class="skill">
-              <div class="skill-name">Adobe Photoshop — <span class="small muted">90%</span></div>
-              <div class="bar"><i style="width:0%" data-width="90%"></i></div>
-            </div>
-            <div class="skill">
-              <div class="skill-name">Adobe Illustrator — <span class="small muted">86%</span></div>
-              <div class="bar"><i style="width:0%" data-width="86%"></i></div>
-            </div>
-            <div class="skill">
-              <div class="skill-name">Premiere Pro / Final Cut — <span class="small muted">84%</span></div>
-              <div class="bar"><i style="width:0%" data-width="84%"></i></div>
-            </div>
-            <div class="skill">
-              <div class="skill-name">After Effects (motion basics) — <span class="small muted">70%</span></div>
-              <div class="bar"><i style="width:0%" data-width="70%"></i></div>
-            </div>
-          </div>
-        </aside>
-      </div>
-    </section>
-
-    <!-- TESTIMONIALS -->
-    <section id="testimonials" aria-labelledby="testiTitle">
-      <div class="section-head">
-        <h2 id="testiTitle">Testimonials</h2>
-        <div class="muted small">Client feedback (placeholders)</div>
-      </div>
-
-      <div class="testimonials">
-        <div class="carousel">
-          <div class="slides" id="slides" style="width:300%">
-            <div class="slide">
-              <div class="quote">"Jyoti transformed our brand. The visuals and video edits were outstanding — highly recommended."</div>
-              <div class="small muted" style="margin-top:8px;font-weight:700">— Rohit K., Founder</div>
-            </div>
-            <div class="slide">
-              <div class="quote">"Fast, communicative, and creative — the edits improved our engagement significantly."</div>
-              <div class="small muted" style="margin-top:8px;font-weight:700">— Neha P., Content Lead</div>
-            </div>
-            <div class="slide">
-              <div class="quote">"Great collaboration. Delivered polished assets exactly as needed."</div>
-              <div class="small muted" style="margin-top:8px;font-weight:700">— Arjun S., Marketing</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- RESUME -->
-    <section id="resume" aria-labelledby="resumeTitle">
-      <div class="section-head">
-        <h2 id="resumeTitle">Résumé</h2>
-        <div class="muted small">Download a one-page summary</div>
-      </div>
-      <div class="resume-panel">
-        <div class="muted">Experience available on the résumé — download for project details, clients & deliverables.</div>
-        <div class="center">
-          <a class="download-btn" href="/resume.pdf" id="resumeDownload">Download Résumé</a>
-        </div>
-      </div>
-    </section>
-
-    <!-- CONTACT -->
-    <section id="contact" aria-labelledby="contactTitle">
-      <div class="section-head">
-        <h2 id="contactTitle">Contact</h2>
-        <div class="muted small">Tell me about your project — budget & timeline help me respond faster</div>
-      </div>
-
-      <div class="contact-panel">
-        <div>
-          <form id="contactForm" onsubmit="return handleContact(event)">
-            <input name="name" placeholder="Your name" required>
-            <input name="email" type="email" placeholder="Your email" required>
-            <input name="subject" placeholder="Subject (e.g., 'Brand refresh')" required>
-            <textarea name="message" placeholder="Short project brief & timeline" required></textarea>
-            <div style="display:flex;gap:12px;align-items:center">
-              <button type="submit">Send message</button>
-              <a class="ghost" href="mailto:jyoti@example.com" id="emailLink">jyoti@example.com</a>
-            </div>
-          </form>
-        </div>
-
-        <aside style="display:flex;flex-direction:column;gap:12px">
-          <div style="padding:12px;border-radius:10px;background:rgba(255,255,255,0.02)">
-            <div style="font-weight:800">Availability</div>
-            <div class="small muted">Remote / Contract / Short projects</div>
-          </div>
-          <div style="padding:12px;border-radius:10px;background:rgba(255,255,255,0.02)">
-            <div style="font-weight:800">Rates</div>
-            <div class="small muted">Starting at $XX / project — custom quotes on request</div>
-          </div>
-        </aside>
-      </div>
-    </section>
-
-    <!-- LIGHTBOX -->
-    <div id="lightbox" class="lightbox" role="dialog" aria-hidden="true">
-      <div class="lb-content" role="document">
-        <div style="display:flex;justify-content:flex-end;padding:8px">
-          <button id="lbClose" class="ghost" aria-label="Close preview">✕</button>
-        </div>
-        <div class="lb-media" id="lbMedia" style="padding:12px">
-          <!-- media injected by JS -->
-        </div>
-        <div class="lb-meta" id="lbMeta">
-          <div class="muted small" id="lbCaption"></div>
-          <div><a id="lbDownload" class="ghost" href="#" download>Download</a></div>
-        </div>
-      </div>
+    
+    <!-- Dark Screen (Initially Hidden) -->
+    <div id="dark-screen" class="screen dark-screen hidden">
+        <!-- Light Button -->
+        <button id="light-button" class="action-button hidden">
+            Turn on the lights
+        </button>
     </div>
-
-    <footer>
-      <div>
-        <strong>© 2025 Jyoti Soni</strong> — Freelance Graphic Designer & Video Editor
-      </div>
-      <div style="display:flex;gap:12px;align-items:center">
-        <a class="muted small" href="#" target="_blank">LinkedIn</a>
-        <a class="muted small" href="#" target="_blank">Behance</a>
-        <a class="muted small" href="#" target="_blank">Instagram</a>
-      </div>
-    </footer>
-  </main>
-
-  <script>
-    /* =========================
-       CONFIG - change these
-       ========================= */
-    const CONTACT_EMAIL = "jyoti@example.com";   // update to your real email
-    const RESUME_PATH = "/resume.pdf";           // update if resume hosted elsewhere
-    /* ========================= */
-
-    // Apply email & resume links
-    document.getElementById('emailLink').href = `mailto:${CONTACT_EMAIL}`;
-    document.getElementById('resumeDownload').href = RESUME_PATH;
-    document.getElementById('downloadResume').href = RESUME_PATH;
-
-    // Fade-up reveals on load scroll
-    function revealOnScroll(){
-      document.querySelectorAll('.fade-up').forEach((el, i) => {
-        setTimeout(()=> el.classList.add('show'), 80 + i*80);
-      });
-    }
-    window.addEventListener('load', revealOnScroll);
-
-    // IntersectionObserver for elements that should animate when visible
-    const io = new IntersectionObserver((entries)=>{
-      entries.forEach(entry=>{
-        if(entry.isIntersecting){
-          entry.target.classList.add('show');
+    
+    <!-- White Screen (Initially Hidden) -->
+    <div id="white-screen" class="screen white-screen hidden">
+        <!-- Decorate Button -->
+        <button id="decorate-button" class="action-button white-button hidden">
+            Decorate
+        </button>
+    </div>
+    
+    <!-- Party Screen (Initially Hidden) -->
+    <div id="party-screen" class="screen hidden">
+        <!-- Confetti Explosion Container -->
+        <div id="confetti-container" class="confetti-explosion"></div>
+        
+        <!-- Party Room Container -->
+        <div class="party-room-container">
+            <!-- Birthday Sticker Image - Using the local uploaded image -->
+            <img id="birthday-sticker" 
+                 src="uploads/419c29c89c5bffb3046a471bcf9e5461-removebg-preview.png" 
+                 alt="Happy Birthday Scene" 
+                 class="party-room-image">
+            
+            <!-- Cake Sticker Container (Initially Hidden) - Positioned on the left side of the room -->
+            <div id="cake-container" class="cake-in-room hidden">
+                <!-- Cake Sticker - Using the provided image -->
+                <img src="https://z-cdn-media.chatglm.cn/files/230b81a5-d0b0-4c97-9d7e-b11ba018bb72_Gemini_Generated_Image_fxkbnlfxkbnlfxkb-removebg-preview.png?auth_key=1863343527-afc45996d1e8462796879686c2de6452-0-1375722b3d0e635a5fa27f83ed88a30b" 
+                     alt="Birthday Cake" 
+                     class="cake-sticker">
+            </div>
+        </div>
+        
+        <!-- Cake Button (Initially Hidden) -->
+        <button id="cake-button" class="action-button absolute bottom-10 left-1/2 transform -translate-x-1/2 hidden z-20">
+            Bring the Cake
+        </button>
+        
+        <!-- Special Letter Button (Initially Hidden) -->
+        <button id="letter-button" class="action-button absolute bottom-10 left-1/2 transform -translate-x-1/2 hidden z-20">
+            Special Letter
+        </button>
+    </div>
+    
+    <!-- Letter Interface (Initially Hidden) -->
+    <div id="letter-interface" class="screen bg-white z-30 hidden overflow-auto">
+        <div class="max-w-3xl mx-auto mt-10 mb-10 h-full">
+            <div class="letter-paper h-full">
+                <div class="letter-content">
+                    <h2 class="text-2xl font-bold mb-4 text-center">A Special Birthday Letter</h2>
+                    <p class="mb-4">Dear Friend,</p>
+                    <p class="mb-4">On this special day, I wanted to take a moment to express how much your friendship means to me. Even though we've only connected online, your presence has brought so much joy and laughter into my life.</p>
+                    <p class="mb-4">Every conversation we've had, every game we've played, and every moment we've shared has created memories that I'll always cherish. Your kindness, humor, and unique perspective on the world never fail to brighten my day.</p>
+                    <p class="mb-4">As you celebrate another year around the sun, I hope you feel surrounded by love and happiness. May this next chapter of your life be filled with exciting adventures, personal growth, and dreams realized.</p>
+                    <p class="mb-4">Thank you for being the wonderful person you are. The world is definitely a better place with you in it.</p>
+                    <p class="mb-4">Wishing you the happiest of birthdays and a year ahead that's as amazing as you are!</p>
+                    <p class="mb-4">With warmest wishes,</p>
+                    <p>Your Online Friend</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Debug Info (can be removed in production) -->
+    <div id="debug-info" class="debug-info hidden">
+        Image Status: <span id="image-status">Loading...</span>
+    </div>
+    
+    <script>
+        // DOM Elements
+        const messageElement = document.getElementById('birthday-message');
+        const cursorElement = document.getElementById('typing-cursor');
+        const surpriseButton = document.getElementById('surprise-button');
+        const darkScreen = document.getElementById('dark-screen');
+        const lightButton = document.getElementById('light-button');
+        const whiteScreen = document.getElementById('white-screen');
+        const decorateButton = document.getElementById('decorate-button');
+        const partyScreen = document.getElementById('party-screen');
+        const cakeButton = document.getElementById('cake-button');
+        const letterButton = document.getElementById('letter-button');
+        const cakeContainer = document.getElementById('cake-container');
+        const letterInterface = document.getElementById('letter-interface');
+        const shapesContainer = document.getElementById('shapes-container');
+        const initialScreen = document.getElementById('initial-screen');
+        const confettiContainer = document.getElementById('confetti-container');
+        const birthdaySticker = document.getElementById('birthday-sticker');
+        const debugInfo = document.getElementById('debug-info');
+        const imageStatus = document.getElementById('image-status');
+        
+        // Birthday Message
+        const birthdayMessage = "Happy Birthday, Alex! Every chat with you brings a smile to my face. Your friendship means the world to me.";
+        
+        // Confetti colors and emojis
+        const confettiColors = ['#FF5252', '#FFEB3B', '#2196F3', '#4CAF50', '#9C27B0', '#FF9800', '#E91E63'];
+        const confettiEmojis = ['🎉', '🎊', '✨', '🌟', '💫', '🎈', '🎁', '🥳', '🎂', '🎈'];
+        
+        // Shape colors
+        const shapeColors = ['rgba(255, 255, 255, 0.3)', 'rgba(255, 192, 203, 0.3)', 'rgba(138, 43, 226, 0.3)'];
+        
+        // Typing Animation
+        function typeMessage() {
+            let index = 0;
+            
+            function typeChar() {
+                if (index < birthdayMessage.length) {
+                    messageElement.textContent += birthdayMessage.charAt(index);
+                    index++;
+                    setTimeout(typeChar, 30); // Reduced typing speed
+                } else {
+                    // Hide cursor after typing is complete
+                    cursorElement.style.display = 'none';
+                }
+            }
+            
+            typeChar();
         }
-      });
-    }, {threshold:0.18});
-    document.querySelectorAll('.fade-up').forEach(el=> io.observe(el));
-    document.querySelectorAll('.service').forEach(el=> io.observe(el));
-    document.querySelectorAll('.project').forEach(el=> io.observe(el));
-
-    // Skill bars animate when 'about' visible
-    const skillsEl = document.querySelector('.skills');
-    if(skillsEl){
-      const skillObserver = new IntersectionObserver((entries)=>{
-        entries.forEach(entry=>{
-          if(entry.isIntersecting){
-            document.querySelectorAll('.bar > i').forEach(i=>{
-              const w = i.getAttribute('data-width') || '80%';
-              i.style.width = w;
-            });
-            skillObserver.disconnect();
-          }
+        
+        // Create Floating Shapes
+        function createFloatingShapes() {
+            const shapeCount = 15; // Number of shapes to create
+            
+            for (let i = 0; i < shapeCount; i++) {
+                // Create random shape
+                const shape = document.createElement('div');
+                const shapeType = Math.floor(Math.random() * 3); // 0: circle, 1: square, 2: blob
+                
+                // Random size between 30px and 80px
+                const size = Math.floor(Math.random() * 50) + 30;
+                
+                // Random position
+                const posX = Math.random() * 100;
+                const posY = Math.random() * 100;
+                
+                // Random color
+                const color = shapeColors[Math.floor(Math.random() * shapeColors.length)];
+                
+                // Random animation duration between 15s and 30s
+                const duration = Math.floor(Math.random() * 15) + 15;
+                
+                // Random delay
+                const delay = Math.random() * 10;
+                
+                // Apply styles based on shape type
+                shape.classList.add('floating-shape');
+                shape.style.width = `${size}px`;
+                shape.style.height = `${size}px`;
+                shape.style.left = `${posX}%`;
+                shape.style.top = `${posY}%`;
+                shape.style.backgroundColor = color;
+                shape.style.animationDuration = `${duration}s`;
+                shape.style.animationDelay = `${delay}s`;
+                
+                if (shapeType === 0) {
+                    // Circle
+                    shape.style.borderRadius = '50%';
+                } else if (shapeType === 1) {
+                    // Square with rounded corners
+                    shape.style.borderRadius = '20%';
+                } else {
+                    // Blob (organic shape)
+                    shape.style.borderRadius = '50% 40% 60% 30% / 40% 50% 60% 50%';
+                }
+                
+                shapesContainer.appendChild(shape);
+            }
+        }
+        
+        // Create Confetti Explosion
+        function createConfettiExplosion() {
+            // Clear any existing confetti
+            confettiContainer.innerHTML = '';
+            
+            // Create confetti pieces
+            const confettiCount = 100; // Number of confetti pieces
+            
+            for (let i = 0; i < confettiCount; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.classList.add('confetti-piece');
+                    
+                    // Randomly choose between emoji or colored shape
+                    if (Math.random() > 0.5) {
+                        // Use emoji
+                        const emoji = confettiEmojis[Math.floor(Math.random() * confettiEmojis.length)];
+                        confetti.textContent = emoji;
+                        confetti.style.fontSize = `${Math.random() * 20 + 10}px`;
+                    } else {
+                        // Use colored shape
+                        const color = confettiColors[Math.floor(Math.random() * confettiColors.length)];
+                        confetti.style.backgroundColor = color;
+                        
+                        // Random shape
+                        const shapeType = Math.floor(Math.random() * 3);
+                        if (shapeType === 0) {
+                            confetti.style.borderRadius = '50%';
+                        } else if (shapeType === 1) {
+                            confetti.style.borderRadius = '0';
+                        } else {
+                            confetti.style.borderRadius = '20%';
+                        }
+                    }
+                    
+                    // Position at center
+                    confetti.style.left = '50%';
+                    confetti.style.top = '50%';
+                    
+                    // Random direction and distance
+                    const angle = Math.random() * Math.PI * 2;
+                    const distance = Math.random() * 500 + 200;
+                    const x = Math.cos(angle) * distance;
+                    const y = Math.sin(angle) * distance;
+                    
+                    // Apply animation
+                    confetti.style.setProperty('--x', `${x}px`);
+                    confetti.style.setProperty('--y', `${y}px`);
+                    confetti.style.animation = `confettiBurst 1.5s ease-out forwards`;
+                    confetti.style.transform = `translate(var(--x), var(--y))`;
+                    
+                    confettiContainer.appendChild(confetti);
+                    
+                    // Remove confetti after animation
+                    setTimeout(() => {
+                        confetti.remove();
+                    }, 1500);
+                }, i * 10); // Stagger the creation of confetti
+            }
+        }
+        
+        // Function to switch screens
+        function switchScreen(hideId, showId) {
+            document.getElementById(hideId).classList.add('hidden');
+            document.getElementById(showId).classList.remove('hidden');
+        }
+        
+        // Function to check if image loads properly
+        function checkImageLoad() {
+            // Show debug info
+            debugInfo.classList.remove('hidden');
+            imageStatus.textContent = 'Checking image...';
+            
+            const img = new Image();
+            img.onload = function() {
+                console.log('Birthday sticker loaded successfully');
+                imageStatus.textContent = 'Image loaded successfully';
+                
+                // Hide debug info after 3 seconds
+                setTimeout(() => {
+                    debugInfo.classList.add('hidden');
+                }, 3000);
+            };
+            img.onerror = function() {
+                console.log('Birthday sticker failed to load');
+                imageStatus.textContent = 'Image failed to load - check file path';
+                
+                // Keep debug info visible if there's an error
+                setTimeout(() => {
+                    debugInfo.classList.add('hidden');
+                }, 5000);
+            };
+            img.src = birthdaySticker.src;
+        }
+        
+        // Event Listeners
+        surpriseButton.addEventListener('click', () => {
+            // Show dark screen
+            switchScreen('initial-screen', 'dark-screen');
+            
+            // Show light button after a short delay
+            setTimeout(() => {
+                lightButton.classList.remove('hidden');
+                lightButton.classList.add('fade-in');
+            }, 500);
         });
-      }, {threshold:0.45});
-      skillObserver.observe(skillsEl);
-    }
-
-    // Simple testimonials carousel
-    const slides = document.getElementById('slides');
-    if(slides){
-      let idx = 0;
-      const total = slides.children.length;
-      setInterval(()=> {
-        idx = (idx + 1) % total;
-        slides.style.transform = `translateX(-${idx*100}%)`;
-      }, 4200);
-    }
-
-    /* ===== LIGHTBOX ===== */
-    const gallery = document.getElementById('gallery');
-    const lightbox = document.getElementById('lightbox');
-    const lbMedia = document.getElementById('lbMedia');
-    const lbCaption = document.getElementById('lbCaption');
-    const lbDownload = document.getElementById('lbDownload');
-    const lbClose = document.getElementById('lbClose');
-
-    function openLightbox(type, src, caption){
-      lbMedia.innerHTML = '';
-      lbCaption.textContent = caption || '';
-      lbDownload.href = src || '#';
-      if(type === 'video'){
-        const v = document.createElement('video');
-        v.src = src; v.controls = true; v.autoplay = true; v.playsInline = true;
-        v.style.maxWidth = '100%'; v.style.maxHeight = '80vh';
-        lbMedia.appendChild(v);
-      } else {
-        const img = document.createElement('img');
-        img.src = src; img.alt = caption || 'Preview';
-        lbMedia.appendChild(img);
-      }
-      lightbox.classList.add('active');
-      lightbox.setAttribute('aria-hidden','false');
-      document.body.style.overflow = 'hidden';
-      lbClose.focus();
-    }
-    function closeLightbox(){
-      lightbox.classList.remove('active');
-      lightbox.setAttribute('aria-hidden','true');
-      document.body.style.overflow = '';
-      lbMedia.innerHTML = '';
-    }
-    gallery && gallery.addEventListener('click', (e)=>{
-      const card = e.target.closest('.project');
-      if(!card) return;
-      const type = card.dataset.type || 'image';
-      const src = card.dataset.full || card.querySelector('img')?.src;
-      const caption = card.querySelector('.meta')?.innerText || '';
-      if(!src) return;
-      openLightbox(type, src, caption);
-    });
-    lbClose.addEventListener('click', closeLightbox);
-    lightbox.addEventListener('click', (e)=> { if(e.target === lightbox) closeLightbox(); });
-    document.addEventListener('keydown', (e)=> { if(e.key === 'Escape') closeLightbox(); });
-
-    /* ===== Contact form (mailto fallback) ===== */
-    function handleContact(e){
-      e.preventDefault();
-      const fm = e.target;
-      const name = fm.name.value.trim();
-      const email = fm.email.value.trim();
-      const subject = fm.subject.value.trim();
-      const message = fm.message.value.trim();
-      const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`);
-      const mailto = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject || 'Project enquiry')}&body=${body}`;
-      window.location.href = mailto;
-      return false;
-    }
-    window.handleContact = handleContact;
-
-    /* ===== Theme toggle (light/dark soft) ===== */
-    const themeToggle = document.getElementById('themeToggle');
-    const root = document.documentElement;
-    const saved = localStorage.getItem('jyoti-theme') || 'dark';
-    if(saved === 'light') root.style.setProperty('--bg','#f6f7fb');
-    themeToggle && themeToggle.addEventListener('click', (e)=>{
-      e.preventDefault();
-      const now = localStorage.getItem('jyoti-theme') === 'light' ? 'dark' : 'light';
-      localStorage.setItem('jyoti-theme', now);
-      if(now === 'light'){
-        root.style.setProperty('--bg','#f6f7fb'); document.body.style.background = '#f6f7fb';
-      } else {
-        root.style.setProperty('--bg','#0D1B2A'); document.body.style.background = 'linear-gradient(180deg,#0D1B2A,#071122)';
-      }
-    });
-
-    /* ===== Particle background (soft) ===== */
-    (function particleInit(){
-      const canvas = document.getElementById('particleCanvas');
-      if(!canvas) return;
-      const ctx = canvas.getContext('2d');
-      let w, h, particles=[];
-      const colors = ["rgba(0,173,181,0.06)","rgba(255,211,105,0.04)","rgba(255,123,84,0.03)"];
-
-      function resize(){
-        w = canvas.width = canvas.offsetWidth;
-        h = canvas.height = canvas.offsetHeight;
-      }
-      window.addEventListener('resize', resize);
-      resize();
-
-      function createParticles(n=80){
-        particles = [];
-        for(let i=0;i<n;i++){
-          particles.push({
-            x: Math.random()*w,
-            y: Math.random()*h,
-            r: 0.5 + Math.random()*2.2,
-            vx: (Math.random()-0.5)*0.2,
-            vy: (Math.random()-0.5)*0.2,
-            col: colors[Math.floor(Math.random()*colors.length)],
-            drift: Math.random()*0.6
-          });
-        }
-      }
-      createParticles(90);
-
-      function tick(){
-        ctx.clearRect(0,0,w,h);
-        for(const p of particles){
-          p.x += p.vx + Math.sin(Date.now()/10000 + p.drift)*0.15;
-          p.y += p.vy + Math.cos(Date.now()/12000 + p.drift)*0.12;
-          if(p.x < -10) p.x = w + 10;
-          if(p.x > w + 10) p.x = -10;
-          if(p.y < -10) p.y = h + 10;
-          if(p.y > h + 10) p.y = -10;
-
-          ctx.beginPath();
-          ctx.fillStyle = p.col;
-          ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
-          ctx.fill();
-        }
-        requestAnimationFrame(tick);
-      }
-      tick();
-    })();
-
-    /* ===== Parallax subtle hero move based on scroll ===== */
-    window.addEventListener('scroll', ()=>{
-      const hero = document.querySelector('.hero');
-      if(!hero) return;
-      const sc = window.scrollY;
-      hero.querySelector('.hero-video') && (hero.querySelector('.hero-video').style.transform = `translateY(${sc * 0.06}px) scale(${1 + Math.min(sc/8000, 0.02)})`);
-    });
-
-    /* ===== Reduce motion preference ===== */
-    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){
-      document.querySelectorAll('*').forEach(el=> el.style.transition = 'none');
-    }
-  </script>
+        
+        lightButton.addEventListener('click', () => {
+            // Hide dark screen and show white screen
+            switchScreen('dark-screen', 'white-screen');
+            
+            // Show decorate button after a short delay
+            setTimeout(() => {
+                decorateButton.classList.remove('hidden');
+                decorateButton.classList.add('fade-in');
+            }, 500);
+        });
+        
+        decorateButton.addEventListener('click', () => {
+            // Hide white screen and show party screen
+            switchScreen('white-screen', 'party-screen');
+            
+            // Check if image loads
+            checkImageLoad();
+            
+            // Create confetti explosion
+            createConfettiExplosion();
+            
+            // Show cake button after a short delay
+            setTimeout(() => {
+                cakeButton.classList.remove('hidden');
+                cakeButton.classList.add('fade-in');
+            }, 500);
+        });
+        
+        cakeButton.addEventListener('click', () => {
+            // Show cake sticker with animation
+            cakeContainer.classList.remove('hidden');
+            cakeContainer.classList.add('cake-appear');
+            
+            // Hide cake button and show letter button
+            cakeButton.classList.add('hidden');
+            letterButton.classList.remove('hidden');
+            letterButton.classList.add('fade-in');
+        });
+        
+        letterButton.addEventListener('click', () => {
+            // Show letter interface
+            switchScreen('party-screen', 'letter-interface');
+        });
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Start typing animation
+            typeMessage();
+            
+            // Create floating shapes
+            createFloatingShapes();
+        });
+    </script>
 </body>
 </html>
